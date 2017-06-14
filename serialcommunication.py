@@ -17,8 +17,8 @@ def init():
 def split_data(datas,sensor_num):
     #intitialize
     data = [0 for i in range (sensor_num)]
+    
     for i in range(sensor_num):
-
         data[i] = datas[(2 + i*16) : (18 + i*16)]
     return data
 
