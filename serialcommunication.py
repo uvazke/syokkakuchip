@@ -14,10 +14,11 @@ def init():
     ser.write(opr_sensor_num)
     ser.write(opr_init)
 
+
 def split_data(datas,sensor_num):
     #intitialize
     data = [0 for i in range (sensor_num)]
-    
+
     for i in range(sensor_num):
         data[i] = datas[(2 + i*16) : (18 + i*16)]
     return data
@@ -42,7 +43,15 @@ def split_and_decompose_data(data,sensor_num):
     vh = np.zeros(4)
     for i in range (sensor_num):
         [vx[i],vy[i],vz[i],vh[i]] = decompose_data(splited_data[i])
-    return [vx,vy,vz,vh]
+
+    #change the data from [x0,x1,x2,...] to [x0,y0,z0,h0],[...
+    v = np.zeros((sensor_num,4))
+    for i in range (sensor_num):
+        v[i] = np.append(np.append(vx[i],vy[i]),np.append(vz[i],vh[i]))
+
+    return v
+
+
 
 
 
@@ -57,11 +66,8 @@ if  __name__ == '__main__':
     while True:
         str0 = ser.readline()
         data0 = str0.decode('utf-8').strip()
-        [vx,vy,vz,vh] = split_and_decompose_data(data0,sensor_num)
-        #change the data from [x0,x1,x2,...] to [x0,y0,z0,h0],[...
-        v = np.zeros((sensor_num,4))
-        for i in range (sensor_num):
-            v[i] = np.append(np.append(vx[i],vy[i]),np.append(vz[i],vh[i]))
+        v = split_and_decompose_data(data0,sensor_num)
+
         print(["vx", "vy" ,"vz", "vh"])
         print(v)
 
