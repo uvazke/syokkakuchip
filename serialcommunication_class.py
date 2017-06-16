@@ -16,6 +16,7 @@ class SerialCommunication:
 
         self.ser.write(opr_sensor_num)
         self.ser.write(opr_init)
+        time.sleep(0.025 + self.sensor_num * 0.05)
         self.ser.write(opr_get)
         data_init = self.read_data()
         #base voltages
@@ -105,7 +106,7 @@ if  __name__ == '__main__':
         F2 = np.append(F2, sercom.F)
         sercom.detect_force(3,matrix3)
         F3 = np.append(F3, sercom.F)
-        time.sleep(1.0)
+        #time.sleep(1.0)
         k += 1
 
         if k % save_prd == 0:
