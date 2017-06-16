@@ -21,7 +21,6 @@ class SerialCommunication:
         #base voltages
         self.data_init = self.split_and_decompose_data(data_init)
 
-
     def read_data(self):
         str0 = self.ser.readline()
         data0 = str0.decode('utf-8').strip()
@@ -39,14 +38,9 @@ class SerialCommunication:
         v_xyz = v[sensor_num][0:3]
         v_h = v[sensor_num][3]
         delV = v_xyz - matrix[:,3]*v_h
-        F = np.dot(matrix[:,0:3],v_xyz)
+        self.F = np.dot(matrix[:,0:3],v_xyz)
         print("F"+str(sensor_num))
-        print(F)
-
-
-
-
-
+        print(self.F)
 
     def split_data(self,datas):
         #intitialize
@@ -85,6 +79,7 @@ class SerialCommunication:
 
 
 if  __name__ == '__main__':
+    save_prd = 3
     #2T-38
     matrix0 = np.array([[-2.835 ,-0.478, -1.271, 0.088],[-0.084, -3.414, -0.736, 0.688],[0.872, -0.019, 2.729, 0.53]])
     #2D-36
@@ -96,12 +91,28 @@ if  __name__ == '__main__':
     sercom = SerialCommunication()
     print ('通信用ポート番号:', sercom.ser.portstr)
     print ('使用センサー数:', sercom.sensor_num)
-
+    k = 0
+    F0 = []
+    F1 = []
+    F2 = []
+    F3 = []
     while True:
         sercom.detect_force(0,matrix0)
+        F0 = np.append(F0, sercom.F)
         sercom.detect_force(1,matrix1)
+        F1 = np.append(F1, sercom.F)
         sercom.detect_force(2,matrix2)
+        F2 = np.append(F2, sercom.F)
         sercom.detect_force(3,matrix3)
+        F3 = np.append(F3, sercom.F)
         time.sleep(1.0)
+        k += 1
+
+        if k % save_prd == 0:
+            np.savetxt('../../programming/data/data1.csv', F0, delimiter=' ')
+            np.savetxt('../../programming/data/data2.csv', F1, delimiter=' ')
+            np.savetxt('../../programming/data/data3.csv', F2, delimiter=' ')
+            np.savetxt('../../programming/data/data4.csv', F3, delimiter=' ')
+
 
     ser.close()
